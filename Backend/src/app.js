@@ -1,67 +1,53 @@
 const express = require('express')
-
+const connectionDB = require("./utils/database")
+const { User } = require('./models/User')
 
 const app = express() 
 
 
-const {adminAuth,userAuth} = require("./middleware/auth")
 
-// app.use("/admin",adminAuth)
-app.get("/admin/data",adminAuth,(req,res)=>{
-    
-    throw new Error("this is error")
+app.post("/signUp",async(req,res)=>{
 
-    console.log("Data is send")
-    res.send("Send data")
-})
+ try {
+       const data = {
+           firstName:"Hari",
+           lastName:"Hari",
+           email:"Hari@123",
+           password:"pass@122",
+   
+       }
+   
+       const user = new User(data)
 
+       await user.save()
 
-app.delete("/admin/data",(req,res)=>{
-    console.log("data is delete")
-    res.send("delete data")
-})
-
-app.use("/user",userAuth)
-app.get("/user/data",(req,res)=>{
-    console.log("Data is send")
-    res.send("Send data")
-})
+       return res.status(200).json({
+        success:true,
+        message:"Sign Up Successfully"
+       })
 
 
-app.delete("/user/data",(req,res)=>{
-    console.log("Data is send")
-    res.send("delete data")
-})
+ } catch (error) {
+    return res.status(500).json({
+        success:false,
+        message:"Something went wrong during singup",
+        errorMessage:error.message
 
+    })
+ }
 
-
-
-
-// app.post("/test",(req,res,next)=>{
-//     console.log("First Req Handler")
-//     res.send("end")
-// },(req,res,next)=>{
-//     console.log("Second Req handler")
-//     next()
-//     res.send("end")
-
-// },(req,res,next)=>{
-//     console.log("third req handler")
-    
-// })
-
-
-app.use("/",(err,req,res,next)=>{
-    res.send("Wild Route")
-    if(err){
-        console.log(err)
-    }
-    
 })
 
 
 
-
-app.listen(7777,()=>{
-    console.log("Server is listening on Port No 7777")
+connectionDB()
+.then(()=>{
+    console.log("Database Connection Successfully Established..")
+    app.listen(7777,(req,res)=>{
+        console.log("Server is successfully listening on port No 7777")
+    })
 })
+.catch((err)=>{
+    console.log("Database cannot be connected")
+})
+
