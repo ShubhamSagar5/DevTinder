@@ -8,6 +8,9 @@ const {adminAuth,userAuth} = require("./middleware/auth")
 
 // app.use("/admin",adminAuth)
 app.get("/admin/data",adminAuth,(req,res)=>{
+    
+    throw new Error("this is error")
+
     console.log("Data is send")
     res.send("Send data")
 })
@@ -48,9 +51,15 @@ app.delete("/user/data",(req,res)=>{
 // })
 
 
-app.use("/",(req,res)=>{
+app.use("/",(err,req,res,next)=>{
     res.send("Wild Route")
+    if(err){
+        console.log(err)
+    }
+    
 })
+
+
 
 
 app.listen(7777,()=>{
