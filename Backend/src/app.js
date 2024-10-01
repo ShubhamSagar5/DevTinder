@@ -4,31 +4,52 @@ const express = require('express')
 const app = express() 
 
 
-app.get("/test/:id",(req,res)=>{
-    console.log(req.params)
+const {adminAuth,userAuth} = require("./middleware/auth")
 
+// app.use("/admin",adminAuth)
+app.get("/admin/data",adminAuth,(req,res)=>{
+    console.log("Data is send")
+    res.send("Send data")
 })
 
-app.get("/man",(req,res)=>{
-    console.log(req.query)
-    res.send("Hello From Test World")
+
+app.delete("/admin/data",(req,res)=>{
+    console.log("data is delete")
+    res.send("delete data")
 })
 
-app.get("/test*c",(req,res)=>{
-    res.send("Hello From Test World")
+app.use("/user",userAuth)
+app.get("/user/data",(req,res)=>{
+    console.log("Data is send")
+    res.send("Send data")
 })
 
-app.use("/car",(req,res)=>{
-    res.send("Hello From Car World")
+
+app.delete("/user/data",(req,res)=>{
+    console.log("Data is send")
+    res.send("delete data")
 })
 
-app.use("/animal",(req,res)=>{
-    res.send("Hello from the animal ")
-})
+
+
+
+
+// app.post("/test",(req,res,next)=>{
+//     console.log("First Req Handler")
+//     res.send("end")
+// },(req,res,next)=>{
+//     console.log("Second Req handler")
+//     next()
+//     res.send("end")
+
+// },(req,res,next)=>{
+//     console.log("third req handler")
+    
+// })
 
 
 app.use("/",(req,res)=>{
-    res.send("This is Home Path")
+    res.send("Wild Route")
 })
 
 
