@@ -1,6 +1,10 @@
 const express = require('express')
-const connectionDB = require("./utils/database")
+const connectionDB = require("./config/database")
 const { User } = require('./models/User')
+const { validateSignupData, validateLoginData } = require('./utils/validatData')
+
+const bcrypt = require('bcrypt')
+
 
 const app = express() 
 
@@ -10,9 +14,20 @@ app.post("/signUp",async(req,res)=>{
 
  try {
 
-        const data  = req.body
-        console.log(req.body)
-        const user = new User(data)
+        const {firstName,lastName,email,password,age,gender} = req.body
+
+        validateSignupData(req)
+        
+        const hashPassword = await bcrypt.hash(password,10) 
+
+        const user = new User({
+            firstName:firstName,
+            lastName:lastName,
+            email:email,
+            password:hashPassword,
+            age:age,
+            gender:gender
+        })
 
        await user.save()
 
@@ -164,6 +179,44 @@ app.delete("/delete",async(req,res)=>{
 
 })
 
+
+app.post("/login",async(req,res)=>{
+    try {
+        
+        const {email,password} = req.body 
+
+        validateLoginData(req)
+
+        const user = await User.findOne({email:email})
+
+        if(!user){
+            throw new Error("Error : Invalid Credentials email not")
+        }
+
+        const isPasswordIsValid = await bcrypt.compare(password,user.password) 
+
+        if(isPasswordIsValid){
+            
+            return res.send("Login successfully")
+       
+       
+        }else{
+            throw new Error("Error : Invalid Credentials password not match")
+
+        }
+
+        return res.send("login Successfully")
+
+
+    } catch (error) {
+        return res.status(500).json({
+            success:false,
+            message:"Something went wrong during login",
+            errorMessage:error.message
+    
+        })
+    }
+})
 
 
 connectionDB()
