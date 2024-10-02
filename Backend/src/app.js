@@ -106,11 +106,25 @@ app.get("/userEmail",async(req,res)=>{
 })
 
 
-app.patch("/update",async(req,res)=>{
+app.patch("/update/:userId",async(req,res)=>{
     try {
         
         const data = req.body
-        const userId = req.body.Id
+        const userId = req.params.userId
+
+        const allowedTypes = ["firstName","lastName","password","age","gender","skills"]
+
+        const isUpdate = Object.keys(data).every((k)=>allowedTypes.includes(k)) 
+
+        console.log(isUpdate)
+
+        if(!isUpdate){
+            throw new Error("You can not update email")
+        }
+
+        if(data.skills.length > 5){
+            throw new Error("You Ca only add 5 Skills ")
+        }
 
         const user = await User.findByIdAndUpdate(userId,data,{returnDocument:"after"})
 
