@@ -4,20 +4,15 @@ const { User } = require('./models/User')
 
 const app = express() 
 
-
+app.use(express.json())
 
 app.post("/signUp",async(req,res)=>{
 
  try {
-       const data = {
-           firstName:"Hari",
-           lastName:"Hari",
-           email:"Hari@123",
-           password:"pass@122",
-   
-       }
-   
-       const user = new User(data)
+
+        const data  = req.body
+        console.log(req.body)
+        const user = new User(data)
 
        await user.save()
 
@@ -35,6 +30,123 @@ app.post("/signUp",async(req,res)=>{
 
     })
  }
+
+})
+
+app.get("/users",async (req,res)=>{
+    try {
+
+        const users = await User.find({})
+
+        if(users.length === 0){
+            return res.send("Database is empty")
+        }else{
+            return res.send(users)
+        }
+        
+    } catch (error) {
+        return res.status(500).json({
+            success:false,
+            message:"Something went wrong during fetchibg all user",
+            errorMessage:error.message
+    
+        })
+    }
+})
+
+app.get("/user",async(req,res)=>{
+    try {
+        
+
+        const userId = req.body.userId 
+        console.log(userId)
+
+        const user = await User.findById({_id:userId})
+        console.log(user)
+        if(!user){
+             res.send("No Entry is found with this id")
+        }else{
+            res.send(user)
+        }
+
+    } catch (error) {
+        return res.status(500).json({
+            success:false,
+            message:"Something went wrong during fetchibg all user",
+            errorMessage:error.message
+    
+        })
+    }
+})
+
+
+app.get("/userEmail",async(req,res)=>{
+    try {
+        
+
+        const email = req.body.email 
+        console.log(email)
+
+        const user = await User.findOne({email:email})
+        console.log(user)
+        if(!user){
+             res.send("No Entry is found with this id")
+        }else{
+            res.send(user)
+        }
+
+    } catch (error) {
+        return res.status(500).json({
+            success:false,
+            message:"Something went wrong during fetchibg all user",
+            errorMessage:error.message
+    
+        })
+    }
+})
+
+
+app.patch("/update",async(req,res)=>{
+    try {
+        
+        const data = req.body
+        const userId = req.body.Id
+
+        const user = await User.findByIdAndUpdate(userId,data,{returnDocument:"after"})
+
+        res.send(user)
+        
+
+    } catch (error) {
+        return res.status(500).json({
+            success:false,
+            message:"Something went wrong during fetchibg all user",
+            errorMessage:error.message
+    
+        })
+    }
+}) 
+
+
+app.delete("/delete",async(req,res)=>{
+
+    try {
+        
+        const userId = req.body.Id 
+
+        const user = await User.findByIdAndDelete({_id:userId})
+
+        res.send(user)
+
+
+    } catch (error) {
+        return res.status(500).json({
+            success:false,
+            message:"Something went wrong during fetchibg all user",
+            errorMessage:error.message
+    
+        })
+    }
 
 })
 
