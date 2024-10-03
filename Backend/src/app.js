@@ -4,11 +4,15 @@ const { User } = require('./models/User')
 const { validateSignupData, validateLoginData } = require('./utils/validatData')
 
 const bcrypt = require('bcrypt')
+const cookieParser = require('cookie-parser')
+const jwt = require("jsonwebtoken")
+const { userAuth } = require('./middleware/auth')
 
 
 const app = express() 
 
 app.use(express.json())
+app.use(cookieParser())
 
 app.post("/signUp",async(req,res)=>{
 
@@ -193,19 +197,22 @@ app.post("/login",async(req,res)=>{
             throw new Error("Error : Invalid Credentials email not")
         }
 
-        const isPasswordIsValid = await bcrypt.compare(password,user.password) 
+        const isPasswordIsValid = await user.validatePassword(password)
 
         if(isPasswordIsValid){
+
+            const token = await user.getJWT()
+
             
-            return res.send("Login successfully")
-       
+            res.cookie("token",token,{expires:new Date(Date.now() + 8 * 3600000),httpOnly:true})
+             res.send("Login successfully")
        
         }else{
             throw new Error("Error : Invalid Credentials password not match")
 
         }
 
-        return res.send("login Successfully")
+        
 
 
     } catch (error) {
@@ -218,6 +225,25 @@ app.post("/login",async(req,res)=>{
     }
 })
 
+
+app.get("/profile",userAuth,async (req,res)=>{
+    try {
+        
+       const user = req.user
+
+
+        res.send(user)
+       
+
+    } catch (error) {
+        return res.status(500).json({
+            success:false,
+            message:"Something went wrong during login",
+            errorMessage:error.message
+    
+        })
+    }
+})
 
 connectionDB()
 .then(()=>{
