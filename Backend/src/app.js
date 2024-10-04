@@ -14,236 +14,162 @@ const app = express()
 app.use(express.json())
 app.use(cookieParser())
 
-app.post("/signUp",async(req,res)=>{
+const authRouter = require("./routes/authRouter")
+const profileRouter = require("./routes/profileRouter") 
 
- try {
+app.use("/",authRouter)
+app.use("/",profileRouter)
 
-        const {firstName,lastName,email,password,age,gender} = req.body
 
-        validateSignupData(req)
+// app.get("/users",async (req,res)=>{
+//     try {
+
+//         const users = await User.find({})
+
+//         if(users.length === 0){
+//             return res.send("Database is empty")
+//         }else{
+//             return res.send(users)
+//         }
         
-        const hashPassword = await bcrypt.hash(password,10) 
-
-        const user = new User({
-            firstName:firstName,
-            lastName:lastName,
-            email:email,
-            password:hashPassword,
-            age:age,
-            gender:gender
-        })
-
-       await user.save()
-
-       return res.status(200).json({
-        success:true,
-        message:"Sign Up Successfully"
-       })
-
-
- } catch (error) {
-    return res.status(500).json({
-        success:false,
-        message:"Something went wrong during singup",
-        errorMessage:error.message
-
-    })
- }
-
-})
-
-app.get("/users",async (req,res)=>{
-    try {
-
-        const users = await User.find({})
-
-        if(users.length === 0){
-            return res.send("Database is empty")
-        }else{
-            return res.send(users)
-        }
-        
-    } catch (error) {
-        return res.status(500).json({
-            success:false,
-            message:"Something went wrong during fetchibg all user",
-            errorMessage:error.message
+//     } catch (error) {
+//         return res.status(500).json({
+//             success:false,
+//             message:"Something went wrong during fetchibg all user",
+//             errorMessage:error.message
     
-        })
-    }
-})
+//         })
+//     }
+// })
 
-app.get("/user",async(req,res)=>{
-    try {
+// app.get("/user",async(req,res)=>{
+//     try {
         
 
-        const userId = req.body.userId 
-        console.log(userId)
+//         const userId = req.body.userId 
+//         console.log(userId)
 
-        const user = await User.findById({_id:userId})
-        console.log(user)
-        if(!user){
-             res.send("No Entry is found with this id")
-        }else{
-            res.send(user)
-        }
+//         const user = await User.findById({_id:userId})
+//         console.log(user)
+//         if(!user){
+//              res.send("No Entry is found with this id")
+//         }else{
+//             res.send(user)
+//         }
 
-    } catch (error) {
-        return res.status(500).json({
-            success:false,
-            message:"Something went wrong during fetchibg all user",
-            errorMessage:error.message
+//     } catch (error) {
+//         return res.status(500).json({
+//             success:false,
+//             message:"Something went wrong during fetchibg all user",
+//             errorMessage:error.message
     
-        })
-    }
-})
+//         })
+//     }
+// })
 
 
-app.get("/userEmail",async(req,res)=>{
-    try {
+// app.get("/userEmail",async(req,res)=>{
+//     try {
         
 
-        const email = req.body.email 
-        console.log(email)
+//         const email = req.body.email 
+//         console.log(email)
 
-        const user = await User.findOne({email:email})
-        console.log(user)
-        if(!user){
-             res.send("No Entry is found with this id")
-        }else{
-            res.send(user)
-        }
+//         const user = await User.findOne({email:email})
+//         console.log(user)
+//         if(!user){
+//              res.send("No Entry is found with this id")
+//         }else{
+//             res.send(user)
+//         }
 
-    } catch (error) {
-        return res.status(500).json({
-            success:false,
-            message:"Something went wrong during fetchibg all user",
-            errorMessage:error.message
+//     } catch (error) {
+//         return res.status(500).json({
+//             success:false,
+//             message:"Something went wrong during fetchibg all user",
+//             errorMessage:error.message
     
-        })
-    }
-})
+//         })
+//     }
+// })
 
 
-app.patch("/update/:userId",async(req,res)=>{
-    try {
+// app.patch("/update/:userId",async(req,res)=>{
+//     try {
         
-        const data = req.body
-        const userId = req.params.userId
+//         const data = req.body
+//         const userId = req.params.userId
 
-        const allowedTypes = ["firstName","lastName","password","age","gender","skills"]
+//         const allowedTypes = ["firstName","lastName","password","age","gender","skills"]
 
-        const isUpdate = Object.keys(data).every((k)=>allowedTypes.includes(k)) 
+//         const isUpdate = Object.keys(data).every((k)=>allowedTypes.includes(k)) 
 
-        console.log(isUpdate)
+//         console.log(isUpdate)
 
-        if(!isUpdate){
-            throw new Error("You can not update email")
-        }
+//         if(!isUpdate){
+//             throw new Error("You can not update email")
+//         }
 
-        if(data.skills.length > 5){
-            throw new Error("You Ca only add 5 Skills ")
-        }
+//         if(data.skills.length > 5){
+//             throw new Error("You Ca only add 5 Skills ")
+//         }
 
-        const user = await User.findByIdAndUpdate(userId,data,{returnDocument:"after"})
+//         const user = await User.findByIdAndUpdate(userId,data,{returnDocument:"after"})
 
-        res.send(user)
+//         res.send(user)
         
 
-    } catch (error) {
-        return res.status(500).json({
-            success:false,
-            message:"Something went wrong during fetchibg all user",
-            errorMessage:error.message
+//     } catch (error) {
+//         return res.status(500).json({
+//             success:false,
+//             message:"Something went wrong during fetchibg all user",
+//             errorMessage:error.message
     
-        })
-    }
-}) 
+//         })
+//     }
+// }) 
 
 
-app.delete("/delete",async(req,res)=>{
+// app.delete("/delete",async(req,res)=>{
 
-    try {
+//     try {
         
-        const userId = req.body.Id 
+//         const userId = req.body.Id 
 
-        const user = await User.findByIdAndDelete({_id:userId})
+//         const user = await User.findByIdAndDelete({_id:userId})
 
-        res.send(user)
+//         res.send(user)
 
 
-    } catch (error) {
-        return res.status(500).json({
-            success:false,
-            message:"Something went wrong during fetchibg all user",
-            errorMessage:error.message
+//     } catch (error) {
+//         return res.status(500).json({
+//             success:false,
+//             message:"Something went wrong during fetchibg all user",
+//             errorMessage:error.message
     
-        })
-    }
+//         })
+//     }
 
-})
+// })
 
-
-app.post("/login",async(req,res)=>{
-    try {
+// app.get("/profile",userAuth,async (req,res)=>{
+//     try {
         
-        const {email,password} = req.body 
-
-        validateLoginData(req)
-
-        const user = await User.findOne({email:email})
-
-        if(!user){
-            throw new Error("Error : Invalid Credentials email not")
-        }
-
-        const isPasswordIsValid = await user.validatePassword(password)
-
-        if(isPasswordIsValid){
-
-            const token = await user.getJWT()
-
-            
-            res.cookie("token",token,{expires:new Date(Date.now() + 8 * 3600000),httpOnly:true})
-             res.send("Login successfully")
-       
-        }else{
-            throw new Error("Error : Invalid Credentials password not match")
-
-        }
-
-        
+//        const user = req.user
 
 
-    } catch (error) {
-        return res.status(500).json({
-            success:false,
-            message:"Something went wrong during login",
-            errorMessage:error.message
-    
-        })
-    }
-})
-
-
-app.get("/profile",userAuth,async (req,res)=>{
-    try {
-        
-       const user = req.user
-
-
-        res.send(user)
+//         res.send(user)
        
 
-    } catch (error) {
-        return res.status(500).json({
-            success:false,
-            message:"Something went wrong during login",
-            errorMessage:error.message
+//     } catch (error) {
+//         return res.status(500).json({
+//             success:false,
+//             message:"Something went wrong during login",
+//             errorMessage:error.message
     
-        })
-    }
-})
+//         })
+//     }
+// })
 
 connectionDB()
 .then(()=>{

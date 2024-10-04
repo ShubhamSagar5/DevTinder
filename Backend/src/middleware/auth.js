@@ -32,7 +32,7 @@ const userAuth = async(req,res,next) => {
         const user = await User.findById(decode._id)
 
         if(!user){
-            throw new Error("User Not Found")
+            throw new Error("User Not Found login with valid credentials")
         }
 
         req.user = user 

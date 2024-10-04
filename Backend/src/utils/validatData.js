@@ -28,7 +28,31 @@ const validateLoginData = (req) => {
 
 }
 
+const validateEditProfileData = (req) => {
+    
+    const data = req.body
+
+    const allowedTypes = ["firstName","lastName","age","gender","photoUrl","about","skills"] 
+
+    const isAllowedTypesValid = Object.keys(data).every((field)=>allowedTypes.includes(field)) 
+
+    return isAllowedTypesValid
+
+}
+
+const validateEditPassword = (req) => {
+
+    const {newPassword} = req.body 
+
+    if(!validator.isStrongPassword(newPassword)){
+        throw new Error("Please Provide Strong Password Which Contain At Least One--[Alphabet,Number,Character,Special Character]")
+    }
+
+}
+
 module.exports = {
     validateSignupData,
-    validateLoginData
+    validateLoginData,
+    validateEditProfileData,
+    validateEditPassword
 }
