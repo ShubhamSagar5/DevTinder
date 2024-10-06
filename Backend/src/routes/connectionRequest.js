@@ -41,8 +41,8 @@ connectionRouter.post("/request/send/:status/:toUserId",userAuth,async(req,res)=
                 }
             ]
         })
-
-        if(existingConnection){
+        
+        if(existingConnection.length ){
             return res.status(400).json({
                 success:false,
                 message:"You Already Send Connection Request"
