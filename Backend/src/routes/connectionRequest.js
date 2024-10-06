@@ -80,4 +80,50 @@ connectionRouter.post("/request/send/:status/:toUserId",userAuth,async(req,res)=
     }
 })
 
+connectionRouter.post("/request/acceptOrReject/:status/:requestId",userAuth,async(req,res)=>{
+    try {
+        
+        const loggedInUser = req.user 
+
+        const {status,requestId} = req.params 
+
+        const allowedTypes = ["accepted","rejected"]
+
+        const isAllwedTypesValid = allowedTypes.includes(status)
+
+        if(!isAllwedTypesValid){
+            return res.status(400).json({
+                message:"Status Type Not Allowed"
+            })
+        }
+
+        const connectionRequest = await ConnectionRequestModel.findOne({
+            _id:requestId,
+            toUserId:loggedInUser._id,
+            status:"interested"
+        })
+
+        if(!connectionRequest){
+            return res.status(404).json({
+                message:"Connection Not Found"
+            })
+        }
+
+         connectionRequest.status = status
+
+         await connectionRequest.save()
+
+         return res.status(200).json({
+            success:true,
+            message:` You ${status} the Request `
+         })
+
+    } catch (error) {
+        return res.status(500).json({
+            success:false,
+            message:error.message
+        })
+    }
+})
+
 module.exports = connectionRouter
