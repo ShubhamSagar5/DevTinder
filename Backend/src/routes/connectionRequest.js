@@ -111,10 +111,11 @@ connectionRouter.post("/request/acceptOrReject/:status/:requestId",userAuth,asyn
 
          connectionRequest.status = status
 
-         await connectionRequest.save()
+        const data =  await connectionRequest.save()
 
          return res.status(200).json({
             success:true,
+            data,
             message:` You ${status} the Request `
          })
 
